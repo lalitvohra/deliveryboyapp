@@ -1,0 +1,84 @@
+<div class="login-page" [@routerTransition]>
+    <div class="row no-gutters vh-100 proh bg-template">
+        <img src="assets/images/apple.png" alt="logo" class="apple right-image align-self-center">
+        <div class="col align-self-center px-3 text-center">
+            <a routerLink="/home" [routerLinkActive]="['active']" queryParamsHandling="merge"><img img
+                    src="{{environment.url}}images/logo.png?ver=1" alt="logo" class="logo-small" /></a>
+            <h2 class="text-white "><span class="font-weight-light">Sign</span>In</h2>
+            <div class="alert" *ngIf="errors.length > 0">
+                <p style="color:white" *ngFor="let error of errors">
+                    {{error}}
+                </p>
+            </div>
+            <form class="form-signin shadow" (ngSubmit)="onSubmit(f)" #f="ngForm">
+                <div class="form-group float-label active">
+                    <input type="text" name="number" id="inputNumber" class="form-control" required autofocus ngModel
+                        (keyup)="onChange()" minlength="10" #loginNumberInput="ngModel" appNumberOnly>
+                    <label for="inputNumber" class="form-control-label">Phone Number</label>
+                    <div class="row">
+                        <div class="col-12">
+                            <div *ngIf="
+                                loginNumberInput.errors?.minlength && 
+                                loginNumberInput.touched
+                            " class="error">
+                                Minimum of 10 digits required
+                            </div>
+                            <div *ngIf="
+                                loginNumberInput.errors?.required && 
+                                loginNumberInput.touched
+                            " class="error">
+                                Number field is required
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="form-group float-label active">
+                    <input type="password" name="password" id="inputPassword" class="form-control" required ngModel
+                        minlength="6" (keyup)="onChange()" #loginPasswordInput="ngModel">
+                    <label for="inputPassword" class="form-control-label">Password</label>
+                    <div class="row">
+                        <div class="col-12">
+                            <div *ngIf="
+                              loginPasswordInput.errors?.minlength && 
+                              loginPasswordInput.touched
+                          " class="error">
+                                Minimum of 6 characters required
+                            </div>
+                            <div *ngIf="
+                              loginNumberInput.errors?.required && 
+                              loginNumberInput.touched
+                          " class="error">
+                                password field is required
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-auto">
+                        <button style="cursor:pointer" [disabled]="!f.valid"
+                            class="btn btn-lg btn-default btn-rounded shadow"><span>Sign in</span><i
+                                class="material-icons">arrow_forward</i></button>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-default btn-rounded"
+                        [disabled]="loginNumberInput.errors?.required || loginNumberInput.errors?.minlength || isLoginVerifying"
+                        (click)="otpForLogin(loginNumberInput)" [innerText]="verifyLoginBtnText">
+                    </button>
+                    <div *ngIf="loginOtpRequested" class="mt-4">
+                        <code-input [isCodeHidden]="false" [isNonDigitsCode]="false" [codeLength]="4"
+                            (codeCompleted)="onLoginCodeCompleted($event, loginNumberInput)">
+                        </code-input>
+
+                    </div>
+                </div>
+            </form>
+            <p class="text-center text-white">
+                Don't have account yet?<br>
+                <a routerLink="/signup" [routerLinkActive]="['active']" queryParamsHandling="merge">Sign Up</a> here.
+            </p>
+        </div>
+    </div>
+</div>

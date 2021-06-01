@@ -1,0 +1,128 @@
+<div class="login-page" [@routerTransition]>
+    <div class="row no-gutters vh-100 proh bg-template">
+        <img src="assets/images/apple.png" alt="logo" class="apple right-image align-self-center" />
+        <div class="col align-self-center px-3 text-center">
+            <a routerLink="/home" [routerLinkActive]="['active']" queryParamsHandling="merge"><img img
+                    src="{{environment.url}}images/logo.png?ver=1" alt="logo" class="logo-small" /></a>
+            <h2 class="text-white">
+                <span class="font-weight-light">Sign</span>Up
+            </h2>
+            <div class="alert" *ngIf="errors.length > 0">
+                <p style="color: white;" *ngFor="let error of errors">
+                    {{ error }}
+                </p>
+            </div>
+            <form class="form-signin shadow" (ngSubmit)="onSubmit(f)" #f="ngForm">
+                <div class="form-group float-label active">
+                    <input type="text" name="name" ngModel class="form-control" required #nameInput="ngModel" />
+                    <label class="form-control-label">Name</label>
+                </div>
+                <div *ngIf="
+            nameInput.errors?.required && nameInput.touched
+        " class="error">
+                    Name field is required
+                </div>
+                <div class="row">
+                    <div class="co-12">
+                        <label for="phone" class="form-control-label" style="color: #bbb;font-size: 13px;padding-left: 15px;">Phone Number (without 0 or +91)</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group float-label active" style="padding-top: 0;">
+                            <input type="text" id="number" name="number" class="form-control"
+                                [disabled]="isNumberVerified" ngModel minlength="10" appNumberOnly required
+                                #numberInput="ngModel" />
+                            <label for="phone" class="form-control-label"></label> <span
+                                *ngIf="isNumberVerified">(verified)</span>
+                        </div>
+                    </div>
+                    <div class="col-6 pt-2" *ngIf="!isNumberVerified">
+                        <button class="btn btn-xs btn-default btn-rounded" *ngIf="
+                                numberInput.dirty &&
+                                !numberInput.errors?.minlength && !numberInput.errors?.required &&
+                                isNumberVerified == false
+                            " (click)="verifyNumber(numberInput)" [disabled]="isVerifying" [innerText]="verifyBtnText">
+                            VERIFY
+                        </button>
+                    </div>
+                </div>
+                <div class="row" *ngIf="!isNumberVerified">
+                    <div class="col-12">
+                        <code-input [isCodeHidden]="false" *ngIf="otpSent" [isNonDigitsCode]="false" [codeLength]="4"
+                            (codeCompleted)="onCodeCompleted($event, numberInput)">
+                        </code-input>
+                    </div>
+
+                </div>
+
+                <div *ngIf="
+                numberInput.errors?.minlength && numberInput.touched
+            " class="error">
+                    Minimum of 10 digits required
+                </div>
+                <div *ngIf="
+                numberInput.errors?.required && numberInput.touched
+            " class="error">
+                    Phone number is required
+                </div>
+                <div class="form-group float-label active">
+                    <input type="email" name="email" id="inputEmail" class="form-control" ngModel email required
+                        #emailInput="ngModel" />
+                    <label for="inputEmail" class="form-control-label">Email address</label>
+                </div>
+                <div *ngIf="
+                  emailInput.errors?.required && emailInput.touched
+              " class="error">
+                    Email field is required
+                </div>
+                <div class="form-group float-label active">
+                    <input type="text" name="address" ngModel class="form-control" required #addressInput="ngModel" />
+                    <label class="form-control-label">Delivery Address</label>
+                </div>
+                <div *ngIf="
+                          addressInput.errors?.required && addressInput.touched
+                      " class="error">
+                    Delivery address is required
+                </div>
+                <div class="form-group float-label active">
+                    <input type="password" name="password" id="inputPassword" class="form-control" ngModel required
+                        required #newPasswordInput="ngModel" minlength="6" />
+                    <label for="inputPassword" class="form-control-label">Password</label>
+                </div>
+                <div *ngIf="
+                  newPasswordInput.errors?.required && newPasswordInput.touched
+              " class="error">
+                    Password field is required
+                </div>
+                <div *ngIf="
+                  newPasswordInput.errors?.minlength && newPasswordInput.touched
+              " class="error">
+                    Password field should be minimum 6 characters
+                </div>
+
+                <!-- <div class="form-group my-4 text-left">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="rememberme">
+                        <label class="custom-control-label" for="rememberme">I accept <a href="#">Terms and
+                                Condition</a></label>
+                    </div>
+                </div> -->
+
+                <div class="row">
+                    <div class="col-auto">
+                        <button [disabled]="!f.valid || isNumberVerified == false"
+                            class="btn btn-lg btn-default btn-rounded shadow">
+                            <span>Sign Up</span><i class="material-icons">arrow_forward</i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <p class="text-center text-white">
+                Already have account?<br />
+                <a routerLink="/login" [routerLinkActive]="['active']" queryParamsHandling="merge">Sign In</a>
+                here.
+            </p>
+        </div>
+    </div>
+</div>

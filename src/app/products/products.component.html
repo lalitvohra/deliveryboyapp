@@ -1,0 +1,52 @@
+  <div class="card shadow-sm border-0 mb-4">
+      <div class="card-body">
+          <button class="btn btn-sm btn-link p-0" (click)="onFavoriteProduct(product.id)">
+              <i class="material-icons md-18">{{checkFavorite(product.id)}}</i>
+          </button>
+          <!-- <div class="badge badge-success float-right mt-1">
+                10% off
+            </div> -->
+          <div class="text-secondary small text-mute mb-0 float-right mt-1">
+              <div *ngIf="product.pivot.type == 0">
+                  <select class="form-group" (change)="onChangeOption($event, i)">
+                      <option *ngFor="
+                                  let option of product.options;
+                                  let i = index
+                              ">
+                          {{ option.name }}</option>
+                  </select>
+              </div>
+              <div *ngIf="product.pivot.type == 1">
+                  &nbsp;
+              </div>
+          </div>
+          <a style="cursor:pointer" [routerLink]="['/product', product.slug]" queryParamsHandling="merge">
+              <figure class="product-image">
+                  <img src="{{ product.image }}" alt="" class="" />
+              </figure>
+          </a>
+
+          <a style="cursor:pointer" [routerLink]="['/product', product.slug]" class=" text-dark mb-1 mt-2 h6 d-block" queryParamsHandling="merge">
+              {{ product.name > 10 ? (product.name | slice: 0:10) +
+                ".."
+              : product.name }}
+          </a>
+          <p class="text-secondary small mb-2">
+              {{
+                      product.description.length > 10
+                          ? (product.description | slice: 0:10) +
+                            ".."
+                          : product.description
+                  }}
+          </p>
+          <h5 class="text-success font-weight-normal mb-0">
+              ₹
+              {{ getProductPrice(i) }}
+          </h5>
+
+          <button class="btn btn-default button-rounded-36 shadow-sm float-bottom-right"
+              (click)="onAddToCart(product.id)">
+              <i class="material-icons md-18">shopping_cart</i>
+          </button>
+      </div>
+  </div>

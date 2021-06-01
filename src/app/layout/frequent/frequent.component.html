@@ -1,0 +1,17 @@
+<div [@routerTransition]>
+    <div class="container">
+
+        <div class="subtitle h6">
+            <div class="d-inline-block">
+                Products that you buy frequently <br>
+                <p class="small text-mute"></p>
+            </div>
+
+        </div>
+        <div class="row">
+            <div app-products class="col-6 col-md-4 col-lg-3 col-xl-2" *ngFor="let product of frequent; let i = index"
+                [product]="product" [cartItems]="cartItems" [loadedProducts]="frequent" [i]="i"
+                [favorites]="favoritesArray"></div>
+        </div>
+    </div>
+</div>

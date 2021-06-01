@@ -1,0 +1,232 @@
+<div [@routerTransition]>
+    <div *ngIf="mode == 'load'">
+        <div class="container">
+            <form>
+                <mat-form-field class="container">
+                    <input matInput [formControl]="searchTerm" [matAutocomplete]="auto" type="text"
+                        class="form-control form-control-lg search my-3" />
+                    <div class="d-flex justify-content-center" *ngIf="searching">
+                        <div class="spinner-border text-warning" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                    <mat-autocomplete #auto="matAutocomplete">
+                        <!-- <mat-option
+                            *ngFor="let product of products"
+                            [value]="product.name"
+                        >
+                            {{ product.name }}
+                        </mat-option> -->
+                    </mat-autocomplete>
+                </mat-form-field>
+            </form>
+            <div class="row">
+                <div class="col-6 col-md-4 col-lg-3 col-xl-2" *ngFor="let product of products; let i = index">
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-body">
+                            <button class="btn btn-sm btn-link p-0">
+                                <i class="material-icons md-18">favorite_outline</i>
+                            </button>
+                            <!-- <div class="badge badge-success float-right mt-1">
+                            10% off
+                        </div> -->
+                            <div class="text-secondary small text-mute mb-0 float-right mt-1">
+                                <div *ngIf="product.type == 0">
+                                    <select class="form-group" (change)="
+                                            onChangeSearchedOption($event, i)
+                                        ">
+                                        <option *ngFor="
+                                                let option of product.options;
+                                                let i = index
+                                            ">
+                                            {{ option.name }}</option>
+                                    </select>
+                                </div>
+                                <div *ngIf="product.type == 1">
+                                    &nbsp;
+                                </div>
+                            </div>
+                            <a style="cursor: pointer;" [routerLink]="['/product', product.slug]" queryParamsHandling="merge">
+                                <figure class="product-image">
+                                    <img src="{{ product.image }}" alt="" class="" />
+                                </figure>
+                            </a>
+
+                            <a style="cursor: pointer;" [routerLink]="['/product', product.slug]"
+                                class="text-dark mb-1 mt-2 h6 d-block" queryParamsHandling="merge">{{
+                                    product.name > 10
+                                        ? (product.name | slice: 0:10) + ".."
+                                        : product.name
+                                }}
+                            </a>
+                            <p class="text-secondary small mb-2">
+                                {{
+                                    product.description.length > 10
+                                        ? (product.description | slice: 0:10) +
+                                          ".."
+                                        : product.description
+                                }}
+                            </p>
+                            <h5 class="text-success font-weight-normal mb-0">
+                                ₹
+                                {{ getSearchedProductPrice(i) }}
+                            </h5>
+
+                            <button class="btn btn-default button-rounded-36 shadow-sm float-bottom-right">
+                                <i class="material-icons md-18" (click)="onSearchToCart(product.id)">shopping_cart</i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row categories">
+                <div class="col-4 col-lg-4 col-centered" style="margin-left: auto">
+                    <a style="cursor: pointer" [routerLink]="['/category', 'fruits']" queryParamsHandling="merge"><img src="{{
+                                environment.url
+                            }}images/fruits-category.jpg" />
+                        <div class="text-center cattext" style="background: #c64b5b">
+                            Fruits
+                        </div>
+                    </a>
+                </div>
+                <div class="col-4 col-lg-4 col-centered" style="margin-right: auto">
+                    <a style="cursor: pointer" [routerLink]="['/category', 'vegetables']" queryParamsHandling="merge"><img src="{{
+                                environment.url
+                            }}images/vegetables-category.jpg" />
+                        <div class="text-center cattext" style="background: #436e46">
+                            Veggies
+                        </div>
+                    </a>
+                </div>
+                <div class="col-4 col-lg-4 col-centered" style="margin-right: auto">
+                    <a style="cursor: pointer" [routerLink]="['/category', 'non-veg']" queryParamsHandling="merge"><img src="{{
+                                environment.url
+                            }}images/seafood-category.jpg" />
+                        <div class="text-center cattext" style="background: #fa2a2a">
+                            Non Veg
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <h6 class="subtitle">All Categories</h6>
+            <div class="row">
+                <!-- Swiper -->
+                <div class="swiper-container small-slide overflow-hidden" [swiper]="configurations">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide" *ngFor="let category of categories; let i = index">
+                            <div class="card shadow-sm border-0">
+                                <a style="cursor: pointer;" [routerLink]="['/category', category.slug]" queryParamsHandling="merge">
+                                    <div class="card-body">
+                                        <div class="row no-gutters h-100">
+                                            <img src="{{ category.image }}" alt="" class="small-slide-right" />
+                                            <div class="col-8">
+                                                <!-- <button class="btn btn-sm btn-link p-0">
+                                                <i class="material-icons md-18">favorite_outline</i>
+                                            </button> -->
+                                                <a style="cursor: pointer;" [routerLink]="[
+                                                        '/category',
+                                                        category.slug
+                                                    ]" class="text-dark mb-1 mt-2 h6 d-block" queryParamsHandling="merge">{{ category.name }}
+                                                </a>
+                                                <p class="text-secondary small">
+                                                    {{ category.description }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h6 class="subtitle">
+                Products
+                <a class="float-right small">All Records</a>
+            </h6>
+            <div class="row">
+                <div app-products class="col-6 col-md-4 col-lg-3 col-xl-2"
+                    *ngFor="let product of featured; let i = index" [product]="product" [cartItems]="cartItems"
+                    [loadedProducts]="featured" [i]="i" [favorites]="favorites"></div>
+            </div>
+        </div>
+        <div class="container-fluid bg-warning text-white my-3">
+            <div class="row">
+                <div class="container">
+                    <div class="row py-4">
+                        <div class="col">
+                            <h1 class="text-uppercase mb-3">
+                                Groceries coming soon
+                            </h1>
+                            <p class="mb-3">
+                                Huge catalog of products<br /><span class="text-dark">& Essentials</span>
+                            </p>
+                        </div>
+                        <div class="col-5 col-md-3 col-lg-2 col-xl-2">
+                            <img src="http://fresh.roundplay.com/images/groc.png" alt="" class="mw-100 mt-3" />
+                        </div>
+                        <div class="w-100"></div>
+                        <div class="col">
+                            <p></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col text-center">
+                    <h5 class="subtitle mb-1">Most Exciting Features</h5>
+                    <p class="text-secondary">Take a look at our services</p>
+                </div>
+            </div>
+            <div class="row text-center mt-4">
+                <div class="col-6 col-md-3">
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-body">
+                            <i class="material-icons mb-4 md-36 text-template">local_shipping</i>
+                            <h2>Free</h2>
+                            <p class="text-secondary text-mute">
+                                Home Delivery
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-body">
+                            <i class="material-icons mb-4 md-36 text-template">shopping_basket</i>
+                            <h2>Quality</h2>
+                            <p class="text-secondary text-mute">
+                                Unmatched
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-body">
+                            <i class="material-icons mb-4 md-36 text-template">done_all</i>
+                            <h2>Zero</h2>
+                            <p class="text-secondary text-mute">
+                                Contact Delivery
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-body">
+                            <i class="material-icons mb-4 md-36 text-template">store</i>
+                            <h2>Pickup</h2>
+                            <p class="text-secondary text-mute">From Store</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

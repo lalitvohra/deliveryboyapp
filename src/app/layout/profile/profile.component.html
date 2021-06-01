@@ -1,0 +1,180 @@
+<div [@routerTransition]>
+    <div class="container">
+        <div class="text-center">
+            <h3 class="">{{user.name}} </h3> <br/>
+            Trip Dist : {{tripInfo.distance}} KM,
+            Trip Time : {{tripInfo.time}} Min            
+        </div>
+        <br>
+       
+        <div class="row">
+            <div class="col-6">
+                <button class="btn btn-sm btn-success" (click) ="refreshOrders()">Refresh</button>
+            </div>
+            <div class="col-6 text-right">
+                <a href="{{routeUrl}}" class="btn btn-sm btn-primary" *ngIf="!fetchingRoute" >CURRENT ROUTE</a>
+            </div>
+        </div>
+        <div class="row" *ngIf="fetchingOrders">
+            <div class="col-12 text-center">
+                <div class="btn btn-default btn-rounded mb-3">
+                    <div class="btn-loader">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <h6 class="d-inline-block text-left mx-2 mb-0 text-normal">
+                        Refreshing orders !!<br /><small class="text-mute">Please wait for a while...</small>
+                    </h6>
+                </div>
+            </div>
+        </div>
+      
+        <div class="row" *ngIf="fetchingRoute">
+            <div class="col-12 text-center">
+                <div class="btn btn-default btn-rounded mb-3">
+                    <div class="btn-loader">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <h6 class="d-inline-block text-left mx-2 mb-0 text-normal">
+                        Getting Route !!<br /><small class="text-mute">Please wait for a while...</small>
+                    </h6>
+                </div>
+            </div>
+        </div>
+        <div class="btn-group mt-4 w-100" role="group" aria-label="Basic example">
+            <a style="cursor: pointer;" class="btn btn-light" [ngClass]="{ active: activeTab == 1 }"
+                (click)="selectTab(1)">PENDING DELIVERIES ({{pendingDeliveries.length}})</a>
+            <a style="cursor: pointer;" class="btn btn-light" [ngClass]="{ active: activeTab == 2 }"
+                (click)="selectTab(2)">DELIVERED ({{markedDeliveries.length}})</a>           
+        </div>
+       
+        <div class="row" *ngIf="activeTab == 1">
+            <div class="col-12 mt-3" *ngFor="let order of pendingDeliveries">
+                <div class="card shadow-sm border-0 mb-3">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col">
+                                <p class="card-title">Order No. {{order.id}}</p> <small style="color:#28bfbd;">ordered
+                                    from:
+                                    {{order.store_name}}</small>
+                            </div>
+                            <div class="col-auto">{{order.created_diff}}</div>
+                        </div>
+                    </div>
+                    <div class="card-body ">
+                        <p>{{order.products.length}} Items For ₹ {{order.total}}</p>
+                        <div><b *ngFor="let item of order.products; let last = last ">{{item.name}}<span
+                                    *ngIf="!last">,</span></b></div>
+                        <hr>
+                        <div>{{order.address}}</div>
+                        <div>
+                            <div class="row mb-4 mt-4">
+                                <div class="col-12">
+                                    <div class="mt-1">
+                                        <a href="tel:{{order.phone_number}}">
+                                            <span class="material-icons">phone_forwarded</span>
+                                        </a>&nbsp;
+                                        <a *ngIf="order.location_accurate == 1" href="http://maps.google.com/maps?q=loc:{{order.lat}}+{{order.lng}}">
+                                            <span class="material-icons">near_me</span>
+                                        </a>&nbsp; 
+                                        <a href="https://wa.me/91{{+order.phone_number}}">
+                                            <img src="assets/images/whatsapp-icon.png" class="order-img-icon" alt="">
+                                        </a> &nbsp; 
+                                        <a class="btn btn-sm btn-default text-white btn-rounded action-buttons" href="https://wa.me/91{{+order.phone_number}}?text={{urlEncodedText(order.id, order.name)}}">REQUEST <i class='material-icons'>my_location</i>
+                                        </a> &nbsp;
+                                        <button *ngIf="!submittingLocation" class="btn btn-sm btn-primary text-white btn-rounded action-buttons" (click) = "updateOrderLocation(order.id)">UPDATE <i class='material-icons'>person_pin_circle</i>
+                                        </button>
+                                        <div class="row" *ngIf="submittingLocation">
+                                            <div class="col-12 text-center">
+                                                <div class="btn btn-default btn-rounded mb-3">
+                                                    <div class="btn-loader">
+                                                        <div></div>
+                                                        <div></div>
+                                                        <div></div>
+                                                        <div></div>
+                                                    </div>
+                                                    <h6 class="d-inline-block text-left mx-2 mb-0 text-normal">
+                                                        submittingLocation !!<br /><small class="text-mute">Please wait for a while...</small>
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <button class="btn btn-warning btn-sm" (click)="markConfirmed(order.id)">CONF</button> &nbsp; <button class="btn btn-success btn-sm" (click)="markOutForDelivery(order.id)">OFD</button>&nbsp;<button class="btn btn-success btn-sm" style="background: #141173" (click)="markDelivered(order.id)"> DELIVERED</button> &nbsp; <button class="btn btn-danger btn-sm" (click) = "unAssignOrder(order.id)">RM</button>
+                                </div>                                
+                            </div>
+                           
+                        </div>
+
+
+                    </div>
+                    <div class="card-footer text-center">
+                        <div class="col-auto" [ngSwitch]="order.status">
+                            <div class="text-primary" *ngSwitchCase="2">Order Confirmed</div>
+                            <div class="text-warning" *ngSwitchCase="3">Order Out for Delivery</div>
+                            <div class="text-success" *ngSwitchCase="4">Order Delivered</div>
+                            <div class="text-success" *ngSwitchCase="5">Order Completed</div>
+                            <div class="text-danger" *ngSwitchCase="6">Order Cancelled</div>
+                            <div class="text-info" *ngSwitchCase="7">Order Refunded</div>
+                            <div class="text-warning d-inline" *ngSwitchDefault>Order Pending</div>                            
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+        <div class="row" *ngIf="activeTab == 2">
+            <div class="col-12 mt-3" *ngFor="let order of markedDeliveries">
+                <div class="card shadow-sm border-0 mb-3">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col">
+                                <p class="card-title">Order No. {{order.id}}</p> <small style="color:#28bfbd;">ordered
+                                    from:
+                                    {{order.store_name}}</small>
+                            </div>
+                            <div class="col-auto">{{order.created_diff}}</div>
+                        </div>
+                    </div>
+                    <div class="card-body ">
+                        <p>{{order.products.length}} Items</p>
+                        <div><b *ngFor="let item of order.products; let last = last ">{{item.name}}<span
+                                    *ngIf="!last">,</span></b></div>
+                        <hr>
+                        <div>
+                            <div class="float-left mt-1">For ₹ {{order.total}}</div>
+                            <!-- <button class="btn btn-success btn-sm float-right" (click)="markDelivered(order.id)"> MARK DELIVERED</button> -->
+                        </div>
+
+
+                    </div>
+                    <div class="card-footer text-center">
+                        <div class="col-auto" [ngSwitch]="order.status">
+                            <div class="text-primary" *ngSwitchCase="2">Order Confirmed</div>
+                            <div class="text-warning" *ngSwitchCase="3">Order Out for Delivery</div>
+                            <div class="text-success" *ngSwitchCase="4">Order Delivered</div>
+                            <div class="text-success" *ngSwitchCase="5">Order Completed</div>
+                            <div class="text-danger" *ngSwitchCase="6">Order Cancelled</div>
+                            <div class="text-info" *ngSwitchCase="7">Order Refunded</div>
+                            <div class="text-warning d-inline" *ngSwitchDefault>Order Pending</div>                            
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+        <br>
+    </div>
+</div>

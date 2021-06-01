@@ -1,0 +1,381 @@
+<div class="container">
+    <div class="card-body border-top-dashed">
+        <div class="row">
+            <div class="col-4">
+                <p class="text-secondary mb-1 small">Sub Total</p>
+                <h5 class="mb-0">₹{{ cartContents.subtotal }}</h5>
+            </div>
+            <div class="col-4 text-center">
+                <p class="text-secondary mb-1 small">Taxes Included</p>
+                <h5 class="mb-0"></h5>
+            </div>
+            <div class="col-4 text-right">
+                <p class="text-secondary mb-1 small">Discount</p>
+                <h5 class="mb-0">-₹{{ cartContents.discounts }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-4 border-0 shadow-sm border-top-dashed">
+        <div class="card-body text-center">
+            <p class="text-secondary my-1">Net Payable</p>
+            <h3 class="mb-0">₹{{ cartContents.total }}</h3>
+        </div>
+    </div>
+    <p class="text-center text-primary mb-2" *ngIf="time >= 18">Delivery by 9 PM Tomorrow </p>
+    <p class="text-center text-primary mb-2" *ngIf="time < 18">Delivery by 9 PM Today </p>
+    
+    <p class="text-center text-secondary mb-0">choose a payment option</p>
+
+    <div class="btn-group mt-4 w-100" role="group" aria-label="Basic example">
+        <a style="cursor: pointer;" class="btn btn-light" [ngClass]="{ active: paymentSelected == 4 }"
+            (click)="selectPayment(4)">PREPAID</a>
+        <a style="cursor: pointer;" class="btn btn-light" [ngClass]="{ active: paymentSelected == 1 }"
+            (click)="selectPayment(1)">CASH ON DELIVERY</a>
+        <!-- <a
+            style="cursor: pointer;"
+            class="btn btn-light"
+            [ngClass]="{ active: paymentSelected == 2 }"
+            (click)="selectPayment(2)"
+            >CARD ON DELIVERY</a
+        >
+        <a
+            style="cursor: pointer;"
+            class="btn btn-light"
+            [ngClass]="{ active: paymentSelected == 3 }"
+            (click)="selectPayment(3)"
+            >STORE PICKUP</a
+        > -->
+
+    </div>
+
+    <div *ngIf="!userLoggedIn">
+        <div class="row">
+            <div class="col-6">
+                <h6 class="subtitle" style="font-size: 85%;">
+                    Enter Your Information
+                </h6>
+            </div>
+            <div class="col-6">
+                <button class="btn btn-xs btn-default btn-rounded" (click)="onClickIHaveAccount()"
+                    style="font-size: 85%; margin-top: 15px;">
+                    I have an account
+                </button>
+            </div>
+        </div>
+
+        <div *ngIf="showLoginForm">
+            <form (ngSubmit)="onLoginSubmit(loginForm)" #loginForm="ngForm">
+                <div class="form-group float-label active">
+                    <input type="text" class="form-control" ngModel name="userNumber" appNumberOnly minlength="10"
+                        #loginNumberInput="ngModel" required />
+                    <label class="form-control-label">Enter Your Number (dont add 0 or +91)</label>
+                    <div class="row">
+                        <div class="col-12">
+                            <div *ngIf="
+                                    loginNumberInput.errors?.minlength &&
+                                    loginNumberInput.touched
+                                " class="error">
+                                Minimum of 10 digits required
+                            </div>
+                            <div *ngIf="
+                                    loginNumberInput.errors?.required &&
+                                    loginNumberInput.touched
+                                " class="error">
+                                Number field is required
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group float-label active">
+                    <input type="password" class="form-control" ngModel name="userPassword" required
+                        #loginPasswordInput="ngModel" minlength="6" />
+                    <label class="form-control-label">Enter your password</label>
+                    <div class="row">
+                        <div class="col-12">
+                            <div *ngIf="
+                                    loginPasswordInput.errors?.minlength &&
+                                    loginPasswordInput.touched
+                                " class="error">
+                                Minimum of 6 characters required
+                            </div>
+                            <div *ngIf="
+                                    loginNumberInput.errors?.required &&
+                                    loginNumberInput.touched
+                                " class="error">
+                                password field is required
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" (click)="onLoginSubmit(loginForm)" class="btn btn-sm btn-default btn-rounded"
+                    [disabled]="!loginForm.valid">
+                    LOGIN
+                </button>
+                <button type="button" class="btn btn-sm btn-default btn-rounded" [disabled]="
+                        loginNumberInput.errors?.required ||
+                        loginNumberInput.errors?.minlength ||
+                        isLoginVerifying
+                    " (click)="otpForLogin(loginNumberInput)" [innerText]="verifyLoginBtnText"></button>
+                <div *ngIf="loginOtpRequested" class="mt-4">
+                    <code-input [isCodeHidden]="false" [isNonDigitsCode]="false" [codeLength]="4" (codeCompleted)="
+                            onLoginCodeCompleted($event, loginNumberInput)
+                        ">
+                    </code-input>
+                </div>
+            </form>
+        </div>
+        <form (ngSubmit)="onSubmit(checkout)" #checkout="ngForm" class="mt-2">
+            <div class="form-group float-label active">
+                <input type="text" name="name" ngModel class="form-control" required #nameInput="ngModel" />
+                <label class="form-control-label">Enter Your Name</label>
+            </div>
+            <div *ngIf="nameInput.errors?.required && nameInput.touched" class="error">
+                Name field is required
+            </div>
+            <div class="form-group float-label active">
+                <input type="email" name="email" ngModel class="form-control" email required #emailInput="ngModel" />
+                <label class="form-control-label">Enter Your Email </label>
+            </div>
+            <div *ngIf="emailInput.errors?.required && emailInput.touched" class="error">
+                Email field is required
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group float-label active">
+                        <input type="text" ngModel name="number" appNumberOnly #numberInput="ngModel"
+                            class="form-control card-type" minlength="10" required />
+                        <label class="form-control-label">Mobile Number (dont add 0 or +91)</label>                        
+                    </div>
+                </div>   
+                <div class="col-12">
+                    <div *ngIf="
+                            numberInput.errors?.minlength && numberInput.touched
+                        " class="error">
+                        Minimum of 10 digits required
+                    </div>
+                    <div *ngIf="
+                            numberInput.errors?.required && numberInput.touched
+                        " class="error">
+                        Phone number is required
+                    </div>
+                </div>
+            </div>
+            <!-- otp verification starts -->
+            <!-- <div class="row">
+                <div class="col-6">
+                    <div class="form-group float-label active">
+                        <input type="text" ngModel name="number" appNumberOnly #numberInput="ngModel"
+                            class="form-control card-type" minlength="10" required [disabled]="isNumberVerified" />
+                        <label class="form-control-label">Mobile Number </label>
+                        <span *ngIf="isNumberVerified">(verified)</span>
+                    </div>
+                </div>
+                <div class="col-6" *ngIf="!isNumberVerified">
+                    <button class="btn btn-xs btn-default btn-rounded" *ngIf="
+                            numberInput.dirty &&
+                            !numberInput.errors?.minlength &&
+                            !numberInput.errors?.required &&
+                            isNumberVerified == false
+                        " (click)="verifyNumber(numberInput)" [disabled]="isVerifying" [innerText]="verifyBtnText">
+                        VERIFY
+                    </button>
+                </div>
+                <div class="col-12" *ngIf="!isNumberVerified">
+                    <code-input [isCodeHidden]="false" *ngIf="otpSent" [isNonDigitsCode]="false" [codeLength]="4"
+                        (codeCompleted)="onCodeCompleted($event, numberInput)">
+                    </code-input>
+                </div>
+                <div class="col-12">
+                    <div *ngIf="
+                            numberInput.errors?.minlength && numberInput.touched
+                        " class="error">
+                        Minimum of 10 digits required
+                    </div>
+                    <div *ngIf="
+                            numberInput.errors?.required && numberInput.touched
+                        " class="error">
+                        Phone number is required
+                    </div>
+                </div>
+            </div> -->
+            <!-- otp verification ends -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group float-label active">
+                        <input type="text" name="address" ngModel class="form-control" required
+                            #addressInput="ngModel" />
+                        <label class="form-control-label">Delivery Address</label>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div *ngIf="
+                            addressInput.errors?.required &&
+                            addressInput.touched
+                        " class="error">
+                        Delivery address is required
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="create_account" class="custom-control-input" id="customCheck2"
+                            (change)="createAccount($event)" />
+                        <label class="custom-control-label" for="customCheck2">Create an account</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4" *ngIf="requirePassword">
+                <div class="col-12">
+                    <div class="form-group float-label active">
+                        <input type="text" class="form-control" ngModel name="newPassword" [required]="requirePassword"
+                            #newPasswordInput="ngModel" minlength="6" />
+                        <label class="form-control-label">Choose a password</label>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div *ngIf="
+                            newPasswordInput.errors?.required &&
+                            newPasswordInput.touched
+                        " class="error">
+                        Password field is required
+                    </div>
+                    <div *ngIf="
+                            newPasswordInput.errors?.minlength &&
+                            newPasswordInput.touched
+                        " class="error">
+                        Password field should be minimum 6 characters
+                    </div>
+                </div>
+            </div>
+
+            <button *ngIf="cartContents.total > 1000" style="cursor: pointer;" type="submit"
+                [disabled]="!checkout.valid || cartContents.total < 1000 "
+                class="btn btn-lg btn-default text-white btn-block btn-rounded shadow">
+                <span>FINALIZE</span><i class="material-icons">arrow_forward</i>
+            </button>
+            <!-- part of otp verification -->
+            <!-- <button *ngIf="cartContents.total > 600" style="cursor: pointer;" type="submit"
+                [disabled]="!checkout.valid || isNumberVerified == false || cartContents.total < 600 "
+                class="btn btn-lg btn-default text-white btn-block btn-rounded shadow">
+                <span>FINALIZE</span><i class="material-icons">arrow_forward</i>
+            </button> -->
+            <!-- part of otp verification ends-->
+        </form>
+    </div>
+
+    <div *ngIf="userLoggedIn">
+        <div class="mb-4 mt-4" *ngIf="showAddressForm">
+            <form (ngSubmit)="onAddressSubmit(addressForm)" #addressForm="ngForm">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group float-label active">
+                            <input type="text" name="newName" ngModel class="form-control" required
+                                #newNameInput="ngModel" />
+                            <label class="form-control-label">Enter a Name</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div *ngIf="
+                                newNameInput.errors?.required &&
+                                newNameInput.touched
+                            " class="error">
+                            Name cannot be empty
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-group float-label active">
+                            <input type="number" name="newPhone" ngModel class="form-control" required
+                                #newPhoneInput="ngModel" />
+                            <label class="form-control-label">Enter a phone number (without 0 or +91)</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div *ngIf="
+                                newPhoneInput.errors?.required &&
+                                newPhoneInput.touched
+                            " class="error">
+                            Number cannot be empty
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-group float-label active">
+                            <input type="text" name="newAddress" ngModel class="form-control" required
+                                #newAddressInput="ngModel" />
+                            <label class="form-control-label">Enter a Delivery Address</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div *ngIf="
+                                newAddressInput.errors?.required &&
+                                newAddressInput.touched
+                            " class="error">
+                            Address cannot be empty
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <button type="button" (click)="onAddressSubmit(addressForm)" class="btn btn-sm btn-default btn-rounded"
+                        [disabled]="!addressForm.valid">
+                        SAVE
+                    </button> &nbsp; <button class="btn btn-sm btn-danger btn-rounded" (click)="onCancelAddressSubmit()">CANCEL</button>                    
+                    </div>
+                    
+                </div>
+            </form>
+        </div>
+        <div class="row mb-4 mt-4" *ngIf="savingAddressForm">
+            <div class="col-12 text-center">
+                <div class="btn btn-default btn-rounded mb-3">
+                    <div class="btn-loader">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <h6 class="d-inline-block text-left mx-2 mb-0 text-normal">
+                        Saving Address !!<br /><small class="text-mute">Please wait for a while...</small>
+                    </h6>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-4 mt-4" *ngIf="!showAddressForm">
+            <div class="col-12 mb-4 mt-2 text-center">
+                <button class="btn btn-success" (click)="onShowAddressForm()">ADD NEW ADDRESS</button>
+            </div>
+           
+            <div class="col-12" *ngFor="let address of user_addresses;">
+                
+                    <input type="radio" class="mt-2 mb-2" id="address{{address.id}}" [(ngModel)]="selected_address" value="{{address.id}}" [checked]="selected_address">                
+                    <label style="display:inline;" class="ml-2" for="address{{address.id}}">{{address.name}}, {{address.phone}}, {{address.address}}</label>
+                               
+            </div>
+        </div>
+    </div>
+    <div class="row" *ngIf="checkingOut">
+        <div class="col-12 text-center">
+            <div class="btn btn-default btn-rounded mb-3">
+                <div class="btn-loader">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+                <h6 class="d-inline-block text-left mx-2 mb-0 text-normal">
+                    Checking Out !!<br /><small class="text-mute">Please wait for a while...</small>
+                </h6>
+            </div>
+        </div>
+    </div>
+    <button *ngIf="!checkingOut && userLoggedIn && cartContents.total > 600" style="cursor: pointer;" type="button"
+        (click)="checkoutUser()" [disabled]="cartContents.total < 1000"
+        class="btn btn-lg btn-default text-white btn-block btn-rounded shadow">
+        <span>FINALIZE</span><i class="material-icons">arrow_forward</i>
+    </button>
+    <div class="error text-center" *ngIf="cartContents.total < 1000">Minimum order value : Rs. 1000</div>
+    <br />
+    <br />
+</div>

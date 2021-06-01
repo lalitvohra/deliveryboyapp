@@ -1,0 +1,35 @@
+<div class="no-gutters">
+    <div class="col-auto mx-auto">
+        <div class="row no-gutters justify-content-center">
+            <div class="col-auto">
+                <a routerLink="/home" [routerLinkActive]="['active']" class="btn btn-link-default" queryParamsHandling="merge">
+                    <i class="material-icons">store_mall_directory</i>
+                </a>
+            </div>
+            <div class="col-auto">
+                <a routerLink="/frequent" [routerLinkActive]="['active']" class="btn btn-link-default" queryParamsHandling="merge">
+                    <i class="material-icons">local_grocery_store</i>
+                </a>
+            </div>
+            <div class="col-auto">
+                <a routerLink="/cart" [routerLinkActive]="['active']" class="btn btn-default shadow centerbutton" queryParamsHandling="merge">
+                    <div *ngIf="count == 0">
+                        <i class="material-icons">local_mall</i>
+                    </div>
+                    <div *ngIf="count !== 0">
+                        <b class="cart_count">{{count}}</b>
+                    </div>
+                </a>
+            </div>
+            <div class="col-auto">
+                <a routerLink="/favorites" [routerLinkActive]="['active']" class="btn btn-link-default" queryParamsHandling="merge">
+                    <i class="material-icons">favorite</i>
+                </a>
+            </div>
+            <div class="col-auto">
+                <a routerLink="/profile" [routerLinkActive]="['active']" class="btn btn-link-default" queryParamsHandling="merge">
+                    <i class="material-icons">account_circle</i>
+                </a>
+            </div>
+        </div>
+    </div>

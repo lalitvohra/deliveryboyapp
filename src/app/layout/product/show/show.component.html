@@ -1,0 +1,51 @@
+<div class="container">
+    <!-- Swiper -->
+    <div class="swiper-container product-details">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide">
+                <img src="{{ product.big_image }}" alt="" />
+            </div>
+        </div>
+        <!-- Add Pagination -->
+        <div class="swiper-pagination"></div>
+    </div>
+
+    <button class="btn btn-sm btn-link p-0" (click)="onFavoriteProduct(product.id)">
+        <i class="material-icons md-18">{{checkFavorite(product.id)}}</i>
+    </button>
+    <p class="text-primary mb-1 mt-2 h6 d-block">{{product.name}}</p>
+
+    <p class="text-secondary">
+        {{product.description}}
+    </p>
+    <div class="row mb-4">
+        <div class="col">
+
+            <div class="row">
+                <div class="col-12">
+                    <h3 class="float-left mt-2 text-success font-weight-normal mb-0">
+                        ₹
+                        {{ getProductPrice() }}
+                    </h3>
+                    <button class="float-right btn btn-lg btn-default shadow btn-rounded" (click)="onAddToCart()">
+                        Add <i class="material-icons md-18">shopping_cart</i>
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-auto align-self-center">
+                    <div class="btn-group mt-4 w-100" role="group" aria-label="Basic example">
+                        <a style="cursor: pointer;" *ngFor="let option of product.options; let i = index"
+                            class="btn btn-light" [ngClass]="{ active: optionSelected == i }"
+                            (click)="selectOption(i)">{{option.name}}</a>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div>

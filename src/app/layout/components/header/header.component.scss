@@ -1,0 +1,13 @@
+:host ::ng-deep .tasktab .nav-tabs {
+    display: none;
+}
+
+.change_store {
+    position: absolute;
+    width: 150px;
+    z-index: 100;
+    line-height: 5px;
+    height: 41px;
+    margin-top: -15px;
+
+}

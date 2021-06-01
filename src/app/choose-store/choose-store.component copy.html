@@ -1,0 +1,67 @@
+<div class="wrapper">
+    <div class="row no-gutters">
+        <div class="col-auto align-self-center">
+
+        </div>
+        <div class="col text-center"><a style="cursor: pointer;" routerLink="/home" queryParamsHandling="merge"><img
+                    src="{{environment.url}}images/logo.png?ver=1" alt="" class="header-logo"></a>
+        </div>
+        <div class="col-auto align-self-center">
+
+
+        </div>
+    </div>
+
+
+    <div class="container mt-4" [@routerTransition]>
+        <div class="row">
+            <div class="col-12 text-center">
+                <div class="row" style="padding-left:15px; padding-right:15px;">
+                    <input class="input" class="form-control search" type="text" [(ngModel)]="autocompleteInput"
+                        #addresstext style="padding: 12px 20px; border: 1px solid #ccc; width: 90%"
+                        placeholder="Enter your approx location"> <i class="material-icons cross-icon"
+                        (click)="clearAddress()">clear</i>
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mb-3">We have {{store.length}} stores in Delhi </div>
+            <div class="col-12 mt-3" *ngFor="let store of stores;">
+                <div class="card shadow-sm border-0 mb-3">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title">{{store.name}}</h5>
+                                <small
+                                    class="text-primary">{{store.km > 0 ? store.km + 'km from your location' : ''}}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-1">
+                                <i class="material-icons">location_on</i>
+                            </div>
+                            <div class="col-10">
+                                <span class="">
+                                    {{store.address}}</span>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="card-footer">
+                        <!-- <button [disabled]="store.km == null || store.km > 10" class="btn btn-primary btn-sm float-left"
+                            (click)="onChooseStore(store.id, store.name, store.km)">CHOOSE
+                            STORE</button> -->
+                        <a href="tel:{{store.phone}}" class="btn btn-warning btn-sm btn-rounded float-left"><i
+                                class="material-icons" style="font-size:16px;">call</i>
+                            {{store.phone}}</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

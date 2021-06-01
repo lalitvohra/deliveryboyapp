@@ -1,0 +1,119 @@
+<div [@routerTransition]>
+    <div class="container">
+
+        <div class="subtitle h6">
+            <div class="d-inline-block">
+                {{category.name}}<br>
+                <p class="small text-mute"></p>
+            </div>
+
+            <div class="container">
+                <form>
+                    <mat-form-field class="container">
+                        <input matInput [formControl]="searchTerm" [matAutocomplete]="auto" type="text"
+                            class="form-control form-control-lg search my-3" />
+                        <mat-autocomplete #auto="matAutocomplete">
+                            <!-- <mat-option
+                              *ngFor="let product of products"
+                              [value]="product.name"
+                          >
+                              {{ product.name }}
+                          </mat-option> -->
+                        </mat-autocomplete>
+                    </mat-form-field>
+                </form>
+                <div class="row">
+                    <div class="col-6 col-md-4 col-lg-3 col-xl-2" *ngFor="let product of products; let i = index">
+                        <div class="card shadow-sm border-0 mb-4">
+                            <div class="card-body">
+                                <button class="btn btn-sm btn-link p-0">
+                                    <i class="material-icons md-18">favorite_outline</i>
+                                </button>
+                                <!-- <div class="badge badge-success float-right mt-1">
+                              10% off
+                          </div> -->
+                                <div class="text-secondary small text-mute mb-0 float-right mt-1">
+                                    <div *ngIf="product.type == 0">
+                                        <select class="form-group" (change)="
+                                              onChangeSearchedOption($event, i)
+                                          ">
+                                            <option *ngFor="
+                                                  let option of product.options;
+                                                  let i = index
+                                              ">
+                                                {{ option.name }}</option>
+                                        </select>
+                                    </div>
+                                    <div *ngIf="product.type == 1">
+                                        &nbsp;
+                                    </div>
+                                </div>
+                                <a style="cursor:pointer" [routerLink]="['/product', product.slug]" queryParamsHandling="merge">
+                                    <figure class="product-image">
+                                        <img src="{{ product.image }}" alt="" class="" />
+                                    </figure>
+                                </a>
+
+                                <a style="cursor:pointer" [routerLink]="['/product', product.slug]"
+                                    class=" text-dark mb-1 mt-2 h6 d-block" queryParamsHandling="merge">{{ product.name > 10 ? (product.name | slice: 0:10) +
+                                        ".."
+                                      : product.name }}
+                                </a>
+                                <p class="text-secondary small mb-2">
+                                    {{
+                                      product.description.length > 10
+                                          ? (product.description | slice: 0:10) +
+                                            ".."
+                                          : product.description
+                                  }}
+                                </p>
+                                <h5 class="text-success font-weight-normal mb-0">
+                                    ₹
+                                    {{ getSearchedProductPrice(i) }}
+                                </h5>
+
+                                <button class="btn btn-default button-rounded-36 shadow-sm float-bottom-right">
+                                    <i class="material-icons md-18"
+                                        (click)="onSearchToCart(product.id)">shopping_cart</i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="container">
+            <div class="row">
+                <div app-products class="col-6 col-md-4 col-lg-3 col-xl-2"
+                    *ngFor="let product of categoryProducts; let i = index" [product]="product" [cartItems]="cartItems"
+                    [loadedProducts]="categoryProducts" [i]="i" [favorites]="favoritesArray"></div>
+            </div>
+        </div>
+
+        <div class="row" *ngIf="isLoading">
+            <div class="col-12 text-center">
+                <div class="btn btn-default btn-rounded mb-3">
+                    <div class="btn-loader">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <h6 class="d-inline-block text-left mx-2 mb-0 text-normal">Loading Content<br><small
+                            class="text-mute">Please wait for a while...</small></h6>
+                </div>
+            </div>
+        </div>
+        <div class="row" *ngIf="reachedEnd">
+            <div class="col-12 text-center">
+                <div class="btn btn-default btn-rounded mb-3">
+
+                    <h6 class="d-inline-block text-left mx-2 mb-0 text-normal">No more products<br><small
+                            class="text-mute"></small></h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
