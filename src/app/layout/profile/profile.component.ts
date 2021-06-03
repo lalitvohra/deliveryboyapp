@@ -130,7 +130,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
                     }
                 });
                 
-            }, 5000);
+            }, 30000);
         }
 
         this.orderIdSocket.onclose = () => {
