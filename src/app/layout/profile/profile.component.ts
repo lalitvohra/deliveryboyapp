@@ -578,7 +578,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
                   )
                   this.submittingLocation = false;
             });
-            
+          this.getUserLocation();  
         
     }
 
