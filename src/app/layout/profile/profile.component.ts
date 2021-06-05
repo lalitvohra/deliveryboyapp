@@ -44,7 +44,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     audio = new Audio();
     noSleep: any;
     tripInfo = {
-        distance: 0,
+        distance: "0",
         time: ""
     }
     submittingLocation = false;
@@ -67,6 +67,24 @@ export class ProfileComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.noSleep.enable();
         this.getUserLocation();
+
+        //test temp
+        // this.http
+        // .get(environment.url + "test")
+        // .subscribe((res: any) => {
+        //     this.pendingDeliveries = res.pendingDeliveries;
+        //     console.log(this.pendingDeliveries);
+        //     let route = JSON.parse(res.route_info);
+        //     let all_waypoints = route['results'][0]['waypoints'];
+        //     all_waypoints = all_waypoints.slice(1, -1) ;
+        //     let index = all_waypoints.map(x => +x.id);
+        //     this.pendingDeliveries.sort((a, b) => index.indexOf(a.id) - index.indexOf(b.id));
+
+
+        //     console.log(index);
+        // })
+        //testmap
+
     }
 
     subscribeUserChannel(){
@@ -204,7 +222,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
                 this.latitude = pos.lat;
                 this.longitude = pos.lng;              
 
-                this.getCurrentRoute(this.latitude, this.longitude);
+                this.getCurrentRouteHere(this.latitude, this.longitude);
                 
             }           
             
@@ -288,6 +306,74 @@ export class ProfileComponent implements OnInit, OnDestroy {
            });
     }
 
+    getCurrentRouteHere(lat: number, lng: number){
+        let params = {
+            lat: lat,
+            lng: lng
+        } 
+        let headers = {};  
+        this.http
+        .post(environment.api_url + "user/deliveries", params)
+        .subscribe((res: any) => {
+            this.fetchingRoute = false;
+            //if(res.status == "OK"){
+            this.pendingDeliveries = res.pendingDeliveries;
+            let outforDelivery: any = this.pendingDeliveries.find(element => element.status == 3);
+            if(outforDelivery){
+                this.openOrderIdChannel(outforDelivery.id);
+            }            
+            this.markedDeliveries = res.markedDeliveries;
+            
+            this.user = res.user;
+            if(this.user.id != ""){
+                this.subscribeUserChannel();
+            }            
+            //this.subscribePusherChannel(); 
+            
+
+                if(res.route_info && res.route_info != null){
+                    let route = JSON.parse(res.route_info);
+                    this.routeInfo = route;
+                    let all_waypoints = route['results'][0]['waypoints'];
+                    let route_points = all_waypoints;
+                    all_waypoints = all_waypoints.slice(1, -1) ;
+                    let index = all_waypoints.map(x => +x.id);
+                                   let distance = route['results'][0]['distance'];
+                    let totalDist = (distance / 1000).toFixed(2);
+                    let time = route['results'][0]['time'];
+                    let totalTime = (time/60).toFixed(2);
+                    this.tripInfo = {distance: totalDist, time: totalTime}
+                   
+                    //sorting
+                    let accurateDeliveries = this.pendingDeliveries.filter(function (x) {
+                        return x.lat != null;
+                    });
+            
+                    let inaccurateDeliveries = this.pendingDeliveries.filter(x => !accurateDeliveries.includes(x));
+                    let sortedDeliveries =  accurateDeliveries.sort((a, b) => index.indexOf(a.id) - index.indexOf(b.id));
+     
+                    let waypoints = [];
+                    route_points.forEach((x) => {
+                        waypoints.push(x['lat']+','+x['lng']);                
+                    });
+                    console.log(waypoints)
+                    let string_waypoints = waypoints.join("/");
+                    this.pendingDeliveries = sortedDeliveries.concat(inaccurateDeliveries);
+                    this.routeUrl = "https://www.google.com/maps/dir/"+string_waypoints;
+                } else {
+                    //error cant fetch route refresh orders or try again.
+                }
+              
+                
+
+            //}            
+            
+            //this.pendingDeliveries = res.pendingDeliveries;
+            //this.markedDeliveries = res.markedDeliveries;  
+            //https://www.google.com/maps/dir/33.93729,-106.85761/33.91629,-106.866761/33.98729,-106.85861          
+        });
+    }
+
     getCurrentRoute(lat: number, lng: number){
         let params = {
             lat: lat,
@@ -351,6 +437,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.pendingDeliveries = sortedDeliveries.concat(inaccurateDeliveries);
 
         this.routeUrl = "https://www.google.com/maps/dir/"+origin+"/"+string_waypoints+"/"+destination;
+
     }
 
     refreshOrders(){
@@ -505,7 +592,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
         }
         totalDist = totalDist / 1000.
 
-        this.tripInfo = {distance: totalDist, time: (totalTime / 60).toFixed(2)}
+        this.tripInfo = {distance: ''+totalDist, time: (totalTime / 60).toFixed(2)}
         //document.getElementById("dvDistance").innerHTML = "total distance is: " + totalDist + " km<br>total time is: " + (totalTime / 60).toFixed(2) + " minutes";
       }
 
