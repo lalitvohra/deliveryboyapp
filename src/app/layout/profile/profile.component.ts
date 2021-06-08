@@ -133,6 +133,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
 
     openOrderIdChannel(orderId){
+        return; //temporary
         let apiKey = environment.piesocket_api_key;
         let channelId = 'order'+orderId;
         this.orderIdSocket = new WebSocket(`wss://us-nyc-1.websocket.me/v3/${channelId}?api_key=${apiKey}`);  //&notify_self for chat
@@ -148,7 +149,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
                     }
                 });
                 
-            }, 30000);
+            }, 5000);
         }
 
         this.orderIdSocket.onclose = () => {
