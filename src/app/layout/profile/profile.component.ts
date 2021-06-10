@@ -223,7 +223,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
                 this.latitude = pos.lat;
                 this.longitude = pos.lng;              
 
-                this.getCurrentRouteHere(this.latitude, this.longitude);
+                this.getCurrentRouteMapbox(this.latitude, this.longitude);
                 
             }           
             
@@ -305,6 +305,98 @@ export class ProfileComponent implements OnInit, OnDestroy {
                 observer.unsubscribe();          
             }, 4000)
            });
+    }
+
+    getCurrentRouteMapbox(lat: number, lng: number){
+        let params = {
+            lat: lat,
+            lng: lng
+        } 
+        let headers = {};  
+        this.http
+        .post(environment.api_url + "user/deliveries", params)
+        .subscribe((res: any) => {
+            this.fetchingRoute = false;
+            //if(res.status == "OK"){
+            this.pendingDeliveries = res.pendingDeliveries;
+            console.log(res);
+            let outforDelivery: any = this.pendingDeliveries.find(element => element.status == 3);
+            if(outforDelivery){
+                this.openOrderIdChannel(outforDelivery.id);
+            }            
+            this.markedDeliveries = res.markedDeliveries;
+            
+            this.user = res.user;
+            if(this.user.id != ""){
+                this.subscribeUserChannel();
+            }            
+            //this.subscribePusherChannel(); 
+            
+
+                if(res.route_info && res.route_info != null){
+                    let route = JSON.parse(res.route_info);
+                    this.routeInfo = route;
+                    
+                    let all_waypoints = route.waypoints;
+                    console.log('test');
+                    console.log(all_waypoints);
+
+                    let waypoint_order = [];
+                    
+                    all_waypoints.forEach((x) => {
+                        waypoint_order.push(x.waypoint_index);
+                    });
+                    
+
+                    all_waypoints.sort(function (x, y) {
+                        return x.waypoint_index - y.waypoint_index;
+                    });
+                    
+
+                    let distance = route.trips[0]['distance'];
+                    let totalDist = (distance / 1000).toFixed(2);
+                    let time = route.trips[0]['duration'];
+                    let totalTime = (time/60).toFixed(2);
+                    this.tripInfo = {distance: totalDist, time: totalTime}
+                   
+                    //sorting
+                    let accurateDeliveries = this.pendingDeliveries.filter(function (x) {
+                        return x.lat != null;
+                    });
+            
+                    let inaccurateDeliveries = this.pendingDeliveries.filter(x => !accurateDeliveries.includes(x));
+                    accurateDeliveries.unshift({});
+                    accurateDeliveries.push({});
+                    let sortedDeliveries = [];
+                    for (let i = 0; i < accurateDeliveries.length; i++) {
+                        sortedDeliveries.push(accurateDeliveries[waypoint_order[i]]);
+                    }   
+
+
+                    let locationAccurateDeliveries = sortedDeliveries.slice(1,-1);
+                    
+                    let waypoints = [];
+                    
+                    all_waypoints.forEach((x) => {
+                        waypoints.push(x.location[1]+','+x.location[0]);                
+                    });
+                                  
+                    let string_waypoints = waypoints.join("/");
+                    this.pendingDeliveries = locationAccurateDeliveries.concat(inaccurateDeliveries);
+                    
+                    this.routeUrl = "https://www.google.com/maps/dir/"+string_waypoints;
+                } else {
+                    //error cant fetch route refresh orders or try again.
+                }
+              
+                
+
+            //}            
+            
+            //this.pendingDeliveries = res.pendingDeliveries;
+            //this.markedDeliveries = res.markedDeliveries;  
+            //https://www.google.com/maps/dir/33.93729,-106.85761/33.91629,-106.866761/33.98729,-106.85861          
+        });
     }
 
     getCurrentRouteHere(lat: number, lng: number){
